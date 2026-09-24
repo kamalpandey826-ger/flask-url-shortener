@@ -6,7 +6,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-DATABASE = "links.db"
+DATABASE = "/data/links.db"
 
 
 def get_db():
@@ -175,4 +175,4 @@ if __name__ == "__main__":
 
     create_database()
 
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
