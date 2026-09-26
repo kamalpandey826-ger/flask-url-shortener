@@ -1,0 +1,85 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 60px 20px;
+}
+
+.container {
+    background: white;
+    width: min(900px, 100%);
+    margin: auto;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0px 5px 20px #ccc;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+input {
+    width: 70%;
+    padding: 12px;
+}
+
+textarea {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    resize: vertical;
+}
+
+button {
+    padding: 12px 20px;
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+}
+
+.short-link {
+    margin-top: 25px;
+    font-size: 20px;
+}
+
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    table-layout: fixed;
+}
+
+.results-table th,
+.results-table td {
+    border: 1px solid #ccc;
+    padding: 12px;
+    text-align: left;
+    vertical-align: top;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.results-table th {
+    background: #f4f4f4;
+}
+
+.results-table th:first-child,
+.results-table td:first-child {
+    width: 65%;
+}
+
+.results-table th:last-child,
+.results-table td:last-child {
+    width: 35%;
+}
+
+.results-table a {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}

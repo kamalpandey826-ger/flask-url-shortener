@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Bulk URL Shortener</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🔗 Bulk URL Shortener</h1>
+
+<p>Paste one URL per line.</p>
+
+<form method="POST">
+
+<textarea
+    name="urls"
+    rows="10"
+    cols="60"
+    placeholder="https://example.com&#10;https://google.com&#10;https://github.com"
+    required
+></textarea>
+
+<br><br>
+
+<button type="submit">
+Shorten All
+</button>
+
+</form>
+
+{% if results %}
+
+<h2>Batch: {{ batch_id }}</h2>
+
+<div class="export-buttons">
+
+    <a href="{{ url_for('export_csv', batch_id=batch_id) }}">
+        <button type="button">Download CSV</button>
+    </a>
+
+    <a href="{{ url_for('export_pdf', batch_id=batch_id) }}">
+        <button type="button">Download PDF</button>
+    </a>
+
+</div>
+
+<h2>Shortened Links</h2>
+
+<table class="results-table">
+
+<tr>
+    <th>Original URL</th>
+    <th>Short URL</th>
+</tr>
+
+{% for result in results %}
+
+<tr>
+    <td>{{ result.url }}</td>
+
+    <td>
+        <a href="{{ result.short_url }}">
+            {{ result.short_url }}
+        </a>
+    </td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+{% endif %}
+
+</div>
+
+</body>
+</html>

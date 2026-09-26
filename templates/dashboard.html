@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Link Dashboard</title>
+</head>
+
+<body>
+
+<h1>🔗 Link Dashboard</h1>
+
+<table border="1" cellpadding="10">
+
+<tr>
+    <th>Short Code</th>
+    <th>Original URL</th>
+    <th>Clicks</th>
+    <th>Created</th>
+</tr>
+
+{% for link in links %}
+
+<tr>
+
+    <td>
+        <a href="/{{ link.code }}">
+            {{ link.code }}
+        </a>
+    </td>
+
+    <td>{{ link.url }}</td>
+
+    <td>{{ link.clicks }}</td>
+
+    <td>{{ link.created_at }}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</body>
+</html>
