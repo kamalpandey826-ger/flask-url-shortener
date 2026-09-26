@@ -2,11 +2,12 @@ from flask import Flask, request, redirect, render_template, render_template_str
 import random
 import string
 import sqlite3
+import os
 from datetime import datetime
 
 app = Flask(__name__)
 
-DATABASE = "/data/links.db"
+DATABASE =os.getenv("DATABASE", "/data/links.db")
 
 
 def get_db():

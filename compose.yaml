@@ -1,0 +1,24 @@
+services:
+  web:
+    build: .
+    container_name: flask-url-shortener
+    environment:
+      DATABASE: /data/links.db
+    volumes:
+    - flask-data:/data
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: flask-nginx
+    ports:
+      - "5001:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - web
+    restart: unless-stopped
+
+volumes:
+  flask-data:
+    external: true
