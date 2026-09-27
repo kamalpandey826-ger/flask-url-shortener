@@ -14,6 +14,37 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 
 app = Flask(__name__)
 
+@app.after_request
+def log_request(response):
+
+    connection = get_db()
+
+    ip_address = request.headers.get(
+        "X-Real-IP",
+        request.remote_addr
+    )
+
+    connection.execute(
+        """
+        INSERT INTO access_logs
+        (ip_address, method, path, status_code, user_agent, created_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """,
+        (
+            ip_address,
+            request.method,
+            request.path,
+            response.status_code,
+            request.headers.get("User-Agent", ""),
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        )
+    )
+
+    connection.commit()
+    connection.close()
+
+    return response
+
 DATABASE =os.getenv("DATABASE", "/data/links.db")
 
 
