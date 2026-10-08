@@ -11,10 +11,15 @@ import unittest
 
 from werkzeug.security import generate_password_hash
 
+TEST_PASSWORD_HASH_METHOD = os.getenv("TEST_PASSWORD_HASH_METHOD", "pbkdf2:sha256:1")
+
 # DATABASE is read when app.py is imported, so set it first.
 _TMP = tempfile.TemporaryDirectory()
 os.environ["DATABASE"] = os.path.join(_TMP.name, "test.db")
-os.environ["ADMIN_PASSWORD_HASH"] = generate_password_hash("test-password")
+os.environ["ADMIN_PASSWORD_HASH"] = generate_password_hash(
+    "test-password",
+    method=TEST_PASSWORD_HASH_METHOD,
+)
 
 import app as shortener  # noqa: E402
 
