@@ -18,6 +18,7 @@
 <p>Paste one URL per line.</p>
 
 <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 
 <textarea
     name="urls"
