@@ -57,6 +57,7 @@ class BaselineTests(unittest.TestCase):
         # Reset the production limiters between isolated tests.
         shortener._login_failures.clear()
         shortener._link_creation_requests.clear()
+        shortener._bulk_creation_requests.clear()
 
         path = os.environ["DATABASE"]
         if os.path.exists(path):
@@ -97,31 +98,76 @@ class BaselineTests(unittest.TestCase):
         self.assertEqual(response.status_code, 429)
         self.assertIn("Retry-After", response.headers)
 
-    def test_bulk_creation_rate_limit_counts_each_url(self):
+    def test_bulk_50_urls_succeeds(self):
         self.login()
 
         with self.client.session_transaction() as session:
             csrf_token = session["csrf_token"]
 
-        blocked, retry_after = shortener.rate_limit_request(
-            "bulk-test-ip",
-            shortener._link_creation_requests,
-            shortener.LINK_CREATE_MAX_REQUESTS,
-            shortener.LINK_CREATE_WINDOW_SECONDS,
-            count=6,
+        response = self.client.post(
+            "/bulk",
+            data={
+                "urls": "\n".join(f"https://example.com/{i}" for i in range(50)),
+                "csrf_token": csrf_token,
+            },
+            follow_redirects=False,
         )
-        self.assertFalse(blocked)
-        self.assertEqual(retry_after, 0)
 
-        blocked, retry_after = shortener.rate_limit_request(
-            "bulk-test-ip",
-            shortener._link_creation_requests,
-            shortener.LINK_CREATE_MAX_REQUESTS,
-            shortener.LINK_CREATE_WINDOW_SECONDS,
-            count=5,
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(query("SELECT COUNT(*) FROM links"), [(50,)])
+
+    def test_bulk_over_limit_returns_429_and_retry_after(self):
+        self.login()
+
+        with self.client.session_transaction() as session:
+            csrf_token = session["csrf_token"]
+
+        for _ in range(6):
+            response = self.client.post(
+                "/bulk",
+                data={
+                    "urls": "\n".join(f"https://example.com/{i}" for i in range(50)),
+                    "csrf_token": csrf_token,
+                },
+                follow_redirects=False,
+            )
+            self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(
+            "/bulk",
+            data={
+                "urls": "\n".join(f"https://example.com/{i}" for i in range(50)),
+                "csrf_token": csrf_token,
+            },
+            follow_redirects=False,
         )
-        self.assertTrue(blocked)
-        self.assertGreater(retry_after, 0)
+
+        self.assertEqual(response.status_code, 429)
+        self.assertIn("Retry-After", response.headers)
+
+    def test_bulk_creation_does_not_use_public_creation_allowance(self):
+        self.login()
+
+        with self.client.session_transaction() as session:
+            csrf_token = session["csrf_token"]
+
+        response = self.client.post(
+            "/bulk",
+            data={
+                "urls": "\n".join(f"https://example.com/{i}" for i in range(5)),
+                "csrf_token": csrf_token,
+            },
+            follow_redirects=False,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        response = self.client.post(
+            "/",
+            data={"url": "https://example.com/public"},
+            follow_redirects=False,
+        )
+
+        self.assertEqual(response.status_code, 200)
 
     def test_creation_limiter_prunes_expired_entries_and_caps_memory(self):
         for index in range(shortener.LINK_CREATE_MAX_TRACKED_ADDRESSES + 5):

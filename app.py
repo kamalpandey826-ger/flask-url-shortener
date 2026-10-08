@@ -50,7 +50,9 @@ _login_failures = {}
 LINK_CREATE_MAX_REQUESTS = 10
 LINK_CREATE_WINDOW_SECONDS = 60
 LINK_CREATE_MAX_TRACKED_ADDRESSES = 10000
+BULK_CREATE_MAX_URLS = 300
 _link_creation_requests = {}
+_bulk_creation_requests = {}
 _link_creation_lock = threading.Lock()
 
 
@@ -504,8 +506,8 @@ def bulk():
         ip = get_client_ip()
         blocked, retry_after = rate_limit_request(
             ip,
-            _link_creation_requests,
-            LINK_CREATE_MAX_REQUESTS,
+            _bulk_creation_requests,
+            BULK_CREATE_MAX_URLS,
             LINK_CREATE_WINDOW_SECONDS,
             count=len(urls),
         )
